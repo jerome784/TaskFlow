@@ -1,0 +1,60 @@
+# ========================
+# OS / Environment
+# ========================
+.DS_Store
+Thumbs.db
+.env
+.env.*.local
+
+# ========================
+# IDEs / Editors
+# ========================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ========================
+# Frontend (React/Vite/Node)
+# ========================
+node_modules/
+dist/
+dist-ssr/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# Backend (Java/Spring/Maven)
+# ========================
+target/
+*.jar
+*.war
+*.ear
+*.class
+.mvn/wrapper/maven-wrapper.jar
+
+# ========================
+# Terraform
+# ========================
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ========================
+# Logs & Database Volumes
+# ========================
+*.log
+docker/db-data/
+postgres-data/

@@ -1,0 +1,15 @@
+{
+  "title": "TaskFlow JVM Metrics",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "JVM Memory Used",
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
