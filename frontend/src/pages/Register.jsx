@@ -1,121 +1,116 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Zap, Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "USER" });
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Replace with actual API call to register
+    // Mock register success and auto-login
     setTimeout(() => {
-      // Mock register success and auto-login
-      login({ id: 2, name: formData.name, email: formData.email, role: formData.role }, "mock-jwt-token-456");
+      login({ id: 2, name: formData.name, email: formData.email, role: "USER" }, "mock-jwt-token-456");
       setIsLoading(false);
-      navigate("/app/dashboard");
+      navigate("/onboarding"); // Critical: force onboarding route
     }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="flex justify-center items-center gap-2 font-bold text-2xl text-slate-50 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white fill-white" />
-          </div>
-          TaskFlow
-        </Link>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-50">
-          Create your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-slate-400">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300">
-            Sign in
-          </Link>
-        </p>
+    <div className="min-h-screen flex bg-vintage-cream text-vintage-charcoal">
+      {/* Left Image Side */}
+      <div className="hidden lg:flex flex-1 relative bg-vintage-beige border-r border-vintage-brown/20 overflow-hidden items-center justify-center p-12">
+        <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-overlay" 
+             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
+        </div>
+        
+        <img 
+          src="/assets/vintage_workspace.png" 
+          alt="Vintage workspace sketch" 
+          className="w-full max-w-lg object-contain rounded-2xl shadow-2xl mix-blend-multiply opacity-90 scale-x-[-1]"
+        />
+        
+        <div className="absolute bottom-12 left-12 right-12 text-center">
+          <p className="font-serif text-2xl text-vintage-charcoal/80 italic">"Design your day, beautifully."</p>
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-slate-900 py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-slate-800">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+      {/* Right Form Side */}
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-16 lg:px-24">
+        <div className="w-full max-w-sm mx-auto">
+          <div className="mb-12">
+            <Link to="/" className="font-serif font-bold text-3xl tracking-tight text-vintage-charcoal flex items-center gap-2">
+              <span className="text-vintage-gold">⚲</span> TaskFlow
+            </Link>
+          </div>
+
+          <h1 className="text-4xl font-serif font-bold mb-2">Join TaskFlow</h1>
+          <p className="text-vintage-brown mb-8 text-sm">Create an account to start organizing your life.</p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-300">
+              <label className="block text-sm font-medium text-vintage-charcoal mb-1">
                 Full Name
               </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm placeholder-slate-500 bg-slate-950 text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
+              <input
+                type="text"
+                required
+                className="vintage-input"
+                placeholder="Jane Doe"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300">
-                Email address
+              <label className="block text-sm font-medium text-vintage-charcoal mb-1">
+                Email Address
               </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm placeholder-slate-500 bg-slate-950 text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
+              <input
+                type="email"
+                required
+                className="vintage-input"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300">
+              <label className="block text-sm font-medium text-vintage-charcoal mb-1">
                 Password
               </label>
-              <div className="mt-1">
-                <input
-                  type="password"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm placeholder-slate-500 bg-slate-950 text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
-              </div>
+              <input
+                type="password"
+                required
+                className="vintage-input"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-300">
-                Role
-              </label>
-              <div className="mt-1">
-                <select
-                  className="appearance-none block w-full px-3 py-2 border border-slate-700 rounded-lg shadow-sm bg-slate-950 text-slate-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                >
-                  <option value="USER">User (Team Member)</option>
-                  <option value="ADMIN">Admin (Project Manager)</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-emerald-500 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-slate-900 disabled:opacity-50"
-              >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full vintage-btn-primary flex items-center justify-center gap-2 py-3 mt-4"
+            >
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+              {!isLoading && <ArrowRight className="w-4 h-4" />}
+            </button>
           </form>
+
+          <p className="mt-8 text-center text-sm text-vintage-brown">
+            Already have an account?{" "}
+            <Link to="/login" className="font-medium text-vintage-olive hover:text-vintage-olive/80 transition-colors">
+              Sign in instead
+            </Link>
+          </p>
         </div>
       </div>
     </div>

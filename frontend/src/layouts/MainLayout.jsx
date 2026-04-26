@@ -7,7 +7,11 @@ import {
   Users, 
   Settings, 
   LogOut,
-  Menu
+  Menu,
+  Calendar,
+  Coffee,
+  BookOpen,
+  Target
 } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../store/authStore";
@@ -16,42 +20,62 @@ import CommandPalette from "../components/CommandPalette";
 
 export default function MainLayout() {
   const { isSidebarOpen, toggleSidebar } = useUIStore();
-  const { user, logout } = useAuthStore();
+  const { user, purpose, logout } = useAuthStore();
   const location = useLocation();
 
-  const navItems = [
-    { name: "Dashboard", path: "/app/dashboard", icon: LayoutDashboard },
+  // Define navigation based on purpose
+  const navItems = purpose === 'TEAM' ? [
+    { name: "Team Dashboard", path: "/app/team-dashboard", icon: LayoutDashboard },
     { name: "Tasks", path: "/app/tasks", icon: CheckSquare },
     { name: "Projects", path: "/app/projects", icon: FolderKanban },
     { name: "Reports", path: "/app/reports", icon: BarChart3 },
     { name: "Profile", path: "/app/profile", icon: Settings },
+  ] : [
+    { name: "My Day", path: "/app/personal-dashboard", icon: LayoutDashboard },
+    { name: "Weekly Planner", path: "/app/planner", icon: Calendar },
+    { name: "Habits Tracker", path: "/app/habits", icon: Coffee },
+    { name: "Journal", path: "/app/journal", icon: BookOpen },
+    { name: "Focus Tasks", path: "/app/tasks", icon: Target },
+    { name: "Profile", path: "/app/profile", icon: Settings },
   ];
 
-  if (user?.role === "ADMIN") {
+  if (purpose === 'TEAM' && user?.role === "ADMIN") {
     navItems.push({ name: "Admin", path: "/app/admin", icon: Users });
   }
 
   return (
-    <div className="flex h-screen bg-slate-900 text-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-vintage-cream text-vintage-charcoal overflow-hidden transition-colors duration-300">
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-slate-950 border-r border-slate-800 transition-all duration-300 flex flex-col",
+          "bg-vintage-beige border-r border-vintage-brown/20 transition-all duration-300 flex flex-col z-20",
           isSidebarOpen ? "w-64" : "w-16"
         )}
       >
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-vintage-brown/20">
           {isSidebarOpen && (
-            <div className="font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 truncate">
-              TaskFlow
+            <div className="font-serif font-bold text-xl tracking-tight text-vintage-charcoal truncate flex items-center gap-2">
+              <span className="text-vintage-olive">⚲</span> TaskFlow
             </div>
           )}
           <button 
             onClick={toggleSidebar}
-            className="p-1 rounded-md hover:bg-slate-800 text-slate-400"
+            className="p-1 rounded-md hover:bg-vintage-brown/10 text-vintage-brown"
           >
             <Menu className="w-5 h-5" />
           </button>
+        </div>
+
+        <div className="px-4 py-3 border-b border-vintage-brown/20">
+          {isSidebarOpen ? (
+             <p className="text-[10px] font-bold uppercase tracking-widest text-vintage-olive">
+               {purpose === 'TEAM' ? 'Team Workspace' : 'Personal Workspace'}
+             </p>
+          ) : (
+            <div className="w-full flex justify-center text-vintage-olive">
+               {purpose === 'TEAM' ? <Users className="w-4 h-4" /> : <User className="w-4 h-4" />}
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto">
@@ -66,30 +90,30 @@ export default function MainLayout() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
                   isActive 
-                    ? "bg-blue-500/10 text-blue-400 font-medium" 
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50",
+                    ? "bg-vintage-olive text-vintage-cream shadow-sm" 
+                    : "text-vintage-charcoal/70 hover:text-vintage-charcoal hover:bg-vintage-brown/10",
                   !isSidebarOpen && "justify-center"
                 )}
                 title={item.name}
               >
-                <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-blue-500")} />
-                {isSidebarOpen && <span>{item.name}</span>}
+                <Icon className={cn("w-5 h-5 flex-shrink-0", isActive && "text-vintage-cream")} />
+                {isSidebarOpen && <span className="font-medium text-sm">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-vintage-brown/20">
           <button
             onClick={logout}
             className={cn(
-              "flex items-center gap-3 text-red-400 hover:text-red-300 w-full transition-colors",
+              "flex items-center gap-3 text-vintage-brown hover:text-vintage-charcoal w-full transition-colors",
               !isSidebarOpen && "justify-center"
             )}
             title="Log out"
           >
             <LogOut className="w-5 h-5" />
-            {isSidebarOpen && <span>Log out</span>}
+            {isSidebarOpen && <span className="font-medium text-sm">Log out</span>}
           </button>
         </div>
       </aside>
@@ -97,28 +121,28 @@ export default function MainLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Navbar */}
-        <header className="h-16 bg-slate-950/50 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 z-10 sticky top-0">
-          <div className="flex items-center text-sm text-slate-400">
+        <header className="h-16 bg-vintage-cream/80 backdrop-blur-md border-b border-vintage-brown/20 flex items-center justify-between px-6 z-10 sticky top-0">
+          <div className="flex items-center text-sm text-vintage-brown">
             <span className="hidden md:inline-block">Press</span>
-            <kbd className="hidden md:inline-block mx-2 px-2 py-0.5 bg-slate-800 rounded border border-slate-700 text-xs font-mono text-slate-300">
+            <kbd className="hidden md:inline-block mx-2 px-2 py-0.5 bg-vintage-beige rounded border border-vintage-brown/30 text-xs font-mono text-vintage-charcoal">
               ⌘K
             </kbd>
             <span className="hidden md:inline-block">to open command palette</span>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium text-slate-200">{user?.name || "User"}</div>
-              <div className="text-xs text-emerald-400">{user?.role || "USER"}</div>
+              <div className="text-sm font-bold font-serif text-vintage-charcoal">{user?.name || "User"}</div>
+              <div className="text-xs text-vintage-brown">{user?.role || "Member"}</div>
             </div>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-full border border-vintage-olive bg-vintage-beige flex items-center justify-center font-bold font-serif text-sm text-vintage-olive">
               {user?.name?.charAt(0) || "U"}
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-slate-900">
+        <main className="flex-1 overflow-auto bg-transparent relative z-0">
           <Outlet />
         </main>
       </div>
