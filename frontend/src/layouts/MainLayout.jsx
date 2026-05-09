@@ -11,12 +11,14 @@ import {
   Calendar,
   Coffee,
   BookOpen,
-  Target
+  Target,
+  User
 } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../store/authStore";
 import { cn } from "../utils/utils";
 import CommandPalette from "../components/CommandPalette";
+import NotificationBell from "../components/features/NotificationBell";
 
 export default function MainLayout() {
   const { isSidebarOpen, toggleSidebar } = useUIStore();
@@ -131,6 +133,8 @@ export default function MainLayout() {
           </div>
           
           <div className="flex items-center gap-4">
+            <NotificationBell />
+            <div className="h-6 w-px bg-vintage-brown/20 hidden sm:block"></div>
             <div className="text-right hidden sm:block">
               <div className="text-sm font-bold font-serif text-vintage-charcoal">{user?.name || "User"}</div>
               <div className="text-xs text-vintage-brown">{user?.role || "Member"}</div>

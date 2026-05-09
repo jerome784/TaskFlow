@@ -2,23 +2,30 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
+import { authApi } from "../api/auth";
+import { apiErrorMessage } from "../api/client";
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // TODO: Replace with actual API call
-    setTimeout(() => {
-      login({ id: 1, name: "Admin User", email: formData.email, role: "ADMIN" }, "mock-jwt-token-123");
-      setIsLoading(false);
+    setError("");
+
+    try {
+      const auth = await authApi.login(formData);
+      login(auth.user, auth.token);
       navigate("/onboarding"); // Route to onboarding to check purpose
-    }, 1000);
+    } catch (err) {
+      setError(apiErrorMessage(err, "Unable to sign in."));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,6 +43,11 @@ export default function Login() {
           <p className="text-vintage-brown mb-8 text-sm">Sign in to organize your work, beautifully.</p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-vintage-charcoal mb-1">
                 Email Address
@@ -69,9 +81,9 @@ export default function Login() {
                 <input type="checkbox" className="w-4 h-4 rounded border-vintage-brown/30 text-vintage-olive focus:ring-vintage-olive accent-vintage-olive" />
                 <span className="text-vintage-brown">Remember me</span>
               </label>
-              <a href="#" className="font-medium text-vintage-olive hover:text-vintage-olive/80 transition-colors">
+              <button type="button" className="font-medium text-vintage-olive hover:text-vintage-olive/80 transition-colors">
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             <button

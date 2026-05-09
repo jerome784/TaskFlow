@@ -1,4 +1,5 @@
-import { Users, FolderKanban, Activity, ArrowUpRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { FolderKanban, Activity, ArrowUpRight } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -8,16 +9,31 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-
-const data = [
-  { name: 'Mon', completed: 12, new: 5 },
-  { name: 'Tue', completed: 19, new: 8 },
-  { name: 'Wed', completed: 15, new: 10 },
-  { name: 'Thu', completed: 22, new: 4 },
-  { name: 'Fri', completed: 30, new: 2 },
-];
+import { reportsApi } from "../../api/reports";
+import { projectsApi } from "../../api/projects";
+import { activityLogsApi } from "../../api/activityLogs";
+import { apiErrorMessage } from "../../api/client";
 
 export default function TeamDashboard() {
+  const { data: summary, isLoading: reportsLoading, error: reportsError } = useQuery({
+    queryKey: ["reports", "summary"],
+    queryFn: reportsApi.summary,
+  });
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: projectsApi.list,
+  });
+  const { data: logs = [] } = useQuery({
+    queryKey: ["activityLogs"],
+    queryFn: activityLogsApi.latest,
+    retry: false,
+  });
+
+  const chartData = Object.entries(summary?.tasksByStatus || {}).map(([name, value]) => ({
+    name: name.replaceAll("_", " "),
+    tasks: value,
+  }));
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between border-b border-vintage-brown/20 pb-6">
@@ -26,21 +42,25 @@ export default function TeamDashboard() {
           <p className="text-vintage-charcoal/70">Track your team's collective progress.</p>
         </div>
         <div className="flex -space-x-2">
-          {['A','B','C','D'].map((initial, i) => (
+          {(summary?.tasksByAssignee || []).slice(0, 4).map((member, i) => (
             <div key={i} className="w-10 h-10 rounded-full border-2 border-vintage-cream bg-vintage-olive flex items-center justify-center text-sm font-bold text-vintage-cream shadow-sm z-10 relative hover:z-20 hover:-translate-y-1 transition-transform cursor-pointer">
-              {initial}
+              {(member.name || "U").charAt(0)}
             </div>
           ))}
           <div className="w-10 h-10 rounded-full border-2 border-vintage-cream bg-vintage-beige flex items-center justify-center text-sm font-bold text-vintage-brown shadow-sm z-10 relative">
-            +3
+            +{Math.max((summary?.tasksByAssignee?.length || 0) - 4, 0)}
           </div>
         </div>
       </div>
 
+      {reportsError && (
+        <div className="vintage-card p-4 text-red-700">{apiErrorMessage(reportsError, "Unable to load dashboard reports.")}</div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Widget title="Active Projects" value="8" trend="+2 this week" icon={FolderKanban} />
-        <Widget title="Tasks Completed" value="142" trend="+12% vs last week" icon={Activity} />
-        <Widget title="Team Velocity" value="High" trend="On track for Q3" icon={ArrowUpRight} />
+        <Widget title="Active Projects" value={projects.length} trend="Live from backend" icon={FolderKanban} />
+        <Widget title="Tasks Completed" value={summary?.completedTasks ?? 0} trend={`${summary?.totalTasks ?? 0} total tasks`} icon={Activity} />
+        <Widget title="Overdue Tasks" value={summary?.overdueTasks ?? 0} trend={reportsLoading ? "Loading..." : "Needs attention"} icon={ArrowUpRight} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
@@ -48,7 +68,7 @@ export default function TeamDashboard() {
           <h2 className="text-xl font-serif font-bold mb-6">Velocity Chart</h2>
           <div className="flex-1 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(139, 111, 71, 0.2)" vertical={false} />
                 <XAxis dataKey="name" stroke="#8B6F47" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#8B6F47" fontSize={12} tickLine={false} axisLine={false} />
@@ -56,8 +76,7 @@ export default function TeamDashboard() {
                   cursor={{fill: 'rgba(139, 111, 71, 0.05)'}}
                   contentStyle={{ backgroundColor: '#F5EFE6', borderColor: 'rgba(139, 111, 71, 0.2)', color: '#2E2A26', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                 />
-                <Bar dataKey="completed" fill="#556B2F" radius={[4, 4, 0, 0]} barSize={40} />
-                <Bar dataKey="new" fill="#C8A96B" radius={[4, 4, 0, 0]} barSize={40} />
+                <Bar dataKey="tasks" fill="#556B2F" radius={[4, 4, 0, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -66,11 +85,18 @@ export default function TeamDashboard() {
         <div className="vintage-card p-6 flex flex-col">
           <h2 className="text-xl font-serif font-bold mb-6">Recent Activity</h2>
           <div className="flex-1 flex flex-col gap-4 overflow-y-auto pr-2">
-            <ActivityItem user="Alice" action="completed task" target="Update Onboarding UI" time="10m ago" />
-            <ActivityItem user="Bob" action="commented on" target="Backend API Spec" time="1h ago" />
-            <ActivityItem user="Charlie" action="moved" target="Database Migration" time="3h ago" status="In Progress" />
-            <ActivityItem user="Diana" action="created project" target="Q4 Marketing Strategy" time="1d ago" />
-            <ActivityItem user="Alice" action="completed task" target="Fix navigation bug" time="1d ago" />
+            {logs.slice(0, 8).map((log) => (
+              <ActivityItem
+                key={log.id}
+                user={log.actor?.name || "System"}
+                action={log.action.replaceAll("_", " ").toLowerCase()}
+                target={log.details}
+                time={new Date(log.createdAt).toLocaleString()}
+              />
+            ))}
+            {logs.length === 0 && (
+              <p className="text-sm text-vintage-brown">No activity yet.</p>
+            )}
           </div>
         </div>
       </div>

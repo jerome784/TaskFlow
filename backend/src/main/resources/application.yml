@@ -1,10 +1,14 @@
 spring:
   application:
     name: taskflow
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
-    url: jdbc:postgresql://localhost:5432/taskflow
-    username: postgres
-    password: 2005
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/taskflow}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:2005}
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,5 +30,9 @@ management:
       enabled: true
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 86400000
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:/app/uploads}
+  max-size: 10MB

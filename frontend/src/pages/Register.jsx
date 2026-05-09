@@ -2,23 +2,30 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
+import { authApi } from "../api/auth";
+import { apiErrorMessage } from "../api/client";
 
 export default function Register() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "DEVELOPER" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Mock register success and auto-login
-    setTimeout(() => {
-      login({ id: 2, name: formData.name, email: formData.email, role: "USER" }, "mock-jwt-token-456");
-      setIsLoading(false);
+    setError("");
+
+    try {
+      const auth = await authApi.register(formData);
+      login(auth.user, auth.token);
       navigate("/onboarding"); // Critical: force onboarding route
-    }, 1000);
+    } catch (err) {
+      setError(apiErrorMessage(err, "Unable to create account."));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,6 +60,11 @@ export default function Register() {
           <p className="text-vintage-brown mb-8 text-sm">Create an account to start organizing your life.</p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-vintage-charcoal mb-1">
                 Full Name
@@ -93,6 +105,21 @@ export default function Register() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-vintage-charcoal mb-1">
+                Role
+              </label>
+              <select
+                className="vintage-input"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              >
+                <option value="DEVELOPER">Developer</option>
+                <option value="MANAGER">Manager</option>
+                <option value="ADMIN">Admin</option>
+              </select>
             </div>
 
             <button

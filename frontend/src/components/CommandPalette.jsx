@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Command } from "cmdk";
-import { LayoutDashboard, CheckSquare, FolderKanban, BarChart3, Settings, Moon, Sun, Calendar, Coffee, BookOpen } from "lucide-react";
+import { LayoutDashboard, CheckSquare, FolderKanban, Settings, Moon, Sun, Calendar, Coffee, BookOpen } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../store/authStore";
 

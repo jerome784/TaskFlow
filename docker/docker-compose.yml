@@ -54,7 +54,7 @@ services:
     image: postgres:15
     container_name: taskflow_db
     ports:
-      - "5432:5432"
+      - "25432:5432"
     environment:
       POSTGRES_DB: taskflow
       POSTGRES_USER: postgres

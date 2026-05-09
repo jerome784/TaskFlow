@@ -1,17 +1,25 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AppRoutes from './routes/AppRoutes';
-
-const queryClient = new QueryClient();
+import { authApi } from './api/auth';
+import { useAuthStore } from './store/authStore';
 
 function App() {
+  const { token, user, setUser, logout } = useAuthStore();
+
+  useEffect(() => {
+    if (!token || user) return;
+
+    authApi.me()
+      .then(setUser)
+      .catch(logout);
+  }, [token, user, setUser, logout]);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </QueryClientProvider>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 
