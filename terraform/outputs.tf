@@ -18,12 +18,13 @@ output "rds_port" {
   value       = module.db.db_instance_port
 }
 
-output "ecr_backend_url" {
-  description = "URL of the backend ECR repository"
-  value       = aws_ecr_repository.backend.repository_url
-}
+# ECR outputs commented out (repositories already created manually)
+# output "ecr_backend_url" {
+#   description = "URL of the backend ECR repository"
+#   value       = aws_ecr_repository.backend.repository_url
+# }
 
-output "ecr_frontend_url" {
-  description = "URL of the frontend ECR repository"
-  value       = aws_ecr_repository.frontend.repository_url
-}
+# output "ecr_frontend_url" {
+#   description = "URL of the frontend ECR repository"
+#   value       = aws_ecr_repository.frontend.repository_url
+# }
