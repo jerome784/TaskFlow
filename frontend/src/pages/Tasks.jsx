@@ -18,6 +18,7 @@ export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [view, setView] = useState("list"); // 'list' or 'kanban'
   const [search, setSearch] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -31,8 +32,8 @@ export default function Tasks() {
   const canManageTasks = user?.role === "ADMIN" || user?.role === "MANAGER";
 
   const { data: tasks = [], isLoading, error } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: () => tasksApi.list(),
+    queryKey: ["tasks", search, priorityFilter],
+    queryFn: () => tasksApi.list({ search, priority: priorityFilter }),
   });
 
   const { data: users = [] } = useQuery({
@@ -73,9 +74,7 @@ export default function Tasks() {
     },
   });
 
-  const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredTasks = tasks; // Filtering is now handled by the backend
 
   const handleCreateTask = () => {
     if (!formData.title.trim()) return;
@@ -131,9 +130,17 @@ export default function Tasks() {
               <Columns className="w-4 h-4" />
             </button>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-vintage-brown/30 bg-transparent hover:bg-vintage-brown/5 text-vintage-charcoal rounded-lg transition-colors text-sm font-medium">
-            <Filter className="w-4 h-4" /> Filter
-          </button>
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="flex items-center gap-2 px-4 py-2 border border-vintage-brown/30 bg-transparent hover:bg-vintage-brown/5 text-vintage-charcoal rounded-lg transition-colors text-sm font-medium appearance-none"
+          >
+            <option value="">All Priorities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
         </div>
       </div>
 

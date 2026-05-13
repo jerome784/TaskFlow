@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -12,7 +13,9 @@ import {
   Coffee,
   BookOpen,
   Target,
-  User
+  User,
+  Moon,
+  Sun
 } from "lucide-react";
 import { useUIStore } from "../store/uiStore";
 import { useAuthStore } from "../store/authStore";
@@ -24,6 +27,23 @@ export default function MainLayout() {
   const { isSidebarOpen, toggleSidebar } = useUIStore();
   const { user, purpose, logout } = useAuthStore();
   const location = useLocation();
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark' || 
+           (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   // Define navigation based on purpose
   const navItems = purpose === 'TEAM' ? [
@@ -46,23 +66,23 @@ export default function MainLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-vintage-cream text-vintage-charcoal overflow-hidden transition-colors duration-300">
+    <div className="flex h-screen bg-vintage-cream dark:bg-vintage-dark-bg text-vintage-charcoal dark:text-vintage-dark-text overflow-hidden transition-colors duration-300">
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-vintage-beige border-r border-vintage-brown/20 transition-all duration-300 flex flex-col z-20",
+          "bg-vintage-beige dark:bg-vintage-dark-surface border-r border-vintage-brown/20 dark:border-vintage-dark-border transition-all duration-300 flex flex-col z-20",
           isSidebarOpen ? "w-64" : "w-16"
         )}
       >
         <div className="h-16 flex items-center justify-between px-4 border-b border-vintage-brown/20">
           {isSidebarOpen && (
-            <div className="font-serif font-bold text-xl tracking-tight text-vintage-charcoal truncate flex items-center gap-2">
+            <div className="font-serif font-bold text-xl tracking-tight text-vintage-charcoal dark:text-vintage-dark-text truncate flex items-center gap-2">
               <span className="text-vintage-olive">⚲</span> TaskFlow
             </div>
           )}
           <button 
             onClick={toggleSidebar}
-            className="p-1 rounded-md hover:bg-vintage-brown/10 text-vintage-brown"
+            className="p-1 rounded-md hover:bg-vintage-brown/10 dark:hover:bg-vintage-dark-border text-vintage-brown dark:text-vintage-dark-text-muted"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -93,7 +113,7 @@ export default function MainLayout() {
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
                   isActive 
                     ? "bg-vintage-olive text-vintage-cream shadow-sm" 
-                    : "text-vintage-charcoal/70 hover:text-vintage-charcoal hover:bg-vintage-brown/10",
+                    : "text-vintage-charcoal/70 dark:text-vintage-dark-text-muted hover:text-vintage-charcoal dark:hover:text-vintage-dark-text hover:bg-vintage-brown/10 dark:hover:bg-vintage-dark-border",
                   !isSidebarOpen && "justify-center"
                 )}
                 title={item.name}
@@ -109,7 +129,7 @@ export default function MainLayout() {
           <button
             onClick={logout}
             className={cn(
-              "flex items-center gap-3 text-vintage-brown hover:text-vintage-charcoal w-full transition-colors",
+              "flex items-center gap-3 text-vintage-brown dark:text-vintage-dark-text-muted hover:text-vintage-charcoal dark:hover:text-vintage-dark-text w-full transition-colors",
               !isSidebarOpen && "justify-center"
             )}
             title="Log out"
@@ -123,21 +143,27 @@ export default function MainLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Navbar */}
-        <header className="h-16 bg-vintage-cream/80 backdrop-blur-md border-b border-vintage-brown/20 flex items-center justify-between px-6 z-10 sticky top-0">
-          <div className="flex items-center text-sm text-vintage-brown">
+        <header className="h-16 bg-vintage-cream/80 dark:bg-vintage-dark-surface/80 backdrop-blur-md border-b border-vintage-brown/20 dark:border-vintage-dark-border flex items-center justify-between px-6 z-10 sticky top-0">
+          <div className="flex items-center text-sm text-vintage-brown dark:text-vintage-dark-text-muted">
             <span className="hidden md:inline-block">Press</span>
-            <kbd className="hidden md:inline-block mx-2 px-2 py-0.5 bg-vintage-beige rounded border border-vintage-brown/30 text-xs font-mono text-vintage-charcoal">
+            <kbd className="hidden md:inline-block mx-2 px-2 py-0.5 bg-vintage-beige dark:bg-vintage-dark-border rounded border border-vintage-brown/30 dark:border-vintage-dark-text-muted text-xs font-mono text-vintage-charcoal dark:text-vintage-dark-text">
               ⌘K
             </kbd>
             <span className="hidden md:inline-block">to open command palette</span>
           </div>
           
           <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-vintage-brown/10 dark:hover:bg-vintage-dark-border text-vintage-brown dark:text-vintage-dark-text-muted transition-colors"
+            >
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <NotificationBell />
-            <div className="h-6 w-px bg-vintage-brown/20 hidden sm:block"></div>
+            <div className="h-6 w-px bg-vintage-brown/20 dark:bg-vintage-dark-border hidden sm:block"></div>
             <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold font-serif text-vintage-charcoal">{user?.name || "User"}</div>
-              <div className="text-xs text-vintage-brown">{user?.role || "Member"}</div>
+              <div className="text-sm font-bold font-serif text-vintage-charcoal dark:text-vintage-dark-text">{user?.name || "User"}</div>
+              <div className="text-xs text-vintage-brown dark:text-vintage-dark-text-muted">{user?.role || "Member"}</div>
             </div>
             <div className="w-9 h-9 rounded-full border border-vintage-olive bg-vintage-beige flex items-center justify-center font-bold font-serif text-sm text-vintage-olive">
               {user?.name?.charAt(0) || "U"}

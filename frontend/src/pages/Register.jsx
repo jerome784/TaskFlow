@@ -118,7 +118,9 @@ export default function Register() {
               >
                 <option value="DEVELOPER">Developer</option>
                 <option value="MANAGER">Manager</option>
-                <option value="ADMIN">Admin</option>
+                {formData.email.toLowerCase() === "jerinjerome22@gmail.com" && (
+                  <option value="ADMIN">Admin</option>
+                )}
               </select>
             </div>
 

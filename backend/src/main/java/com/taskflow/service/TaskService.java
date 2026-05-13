@@ -30,17 +30,16 @@ public class TaskService {
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
-    public List<TaskResponse> listTasks(TaskStatus status, Long projectId) {
+    public List<TaskResponse> listTasks(TaskStatus status, Long projectId, Priority priority, String search) {
         User current = userService.getCurrentUserEntity();
-        List<Task> tasks = canManageTasks(current)
-            ? taskRepository.findAll()
-            : taskRepository.findByAssigneeId(current.getId());
+        
+        String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
 
-        return tasks.stream()
-            .filter(task -> status == null || task.getStatus() == status)
-            .filter(task -> projectId == null || (task.getProject() != null && Objects.equals(task.getProject().getId(), projectId)))
-            .map(TaskResponse::from)
-            .toList();
+        List<Task> tasks = canManageTasks(current)
+            ? taskRepository.findByFilters(status, projectId, priority, searchParam)
+            : taskRepository.findByAssigneeIdAndFilters(current.getId(), status, projectId, priority, searchParam);
+
+        return tasks.stream().map(TaskResponse::from).toList();
     }
 
     @Transactional(readOnly = true)

@@ -4,6 +4,7 @@ import com.taskflow.dto.request.StatusUpdateRequest;
 import com.taskflow.dto.request.TaskRequest;
 import com.taskflow.dto.response.ApiResponse;
 import com.taskflow.dto.response.TaskResponse;
+import com.taskflow.enums.Priority;
 import com.taskflow.enums.TaskStatus;
 import com.taskflow.service.TaskService;
 import jakarta.validation.Valid;
@@ -31,9 +32,11 @@ public class TaskController {
     @GetMapping
     public ApiResponse<List<TaskResponse>> listTasks(
         @RequestParam(required = false) TaskStatus status,
-        @RequestParam(required = false) Long projectId
+        @RequestParam(required = false) Long projectId,
+        @RequestParam(required = false) Priority priority,
+        @RequestParam(required = false) String search
     ) {
-        return ApiResponse.success("Tasks loaded.", taskService.listTasks(status, projectId));
+        return ApiResponse.success("Tasks loaded.", taskService.listTasks(status, projectId, priority, search));
     }
 
     @GetMapping("/{id}")
