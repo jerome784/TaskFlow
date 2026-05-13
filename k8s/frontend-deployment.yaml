@@ -17,4 +17,4 @@ spec:
         - name: frontend
           image: taskflow-frontend:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
