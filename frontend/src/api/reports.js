@@ -5,7 +5,7 @@ export const reportsApi = {
     return unwrap(await apiClient.get("/reports/summary"));
   },
   exportTasksUrl() {
-    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+    const baseUrl = import.meta.env.VITE_API_URL || "/api";
     return `${baseUrl}/reports/tasks.csv`;
   },
 };

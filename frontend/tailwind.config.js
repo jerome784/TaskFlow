@@ -9,12 +9,12 @@ export default {
     extend: {
       colors: {
         vintage: {
-          olive: "#556B2F",
-          beige: "#E8DCCB",
-          cream: "#F5EFE6",
-          brown: "#8B6F47",
-          charcoal: "#2E2A26",
-          gold: "#C8A96B",
+          olive: "#6366f1",   // Vibrant Indigo
+          beige: "#eef2ff",   // Very light indigo tint for sidebars
+          cream: "#faf5ff",   // Very light fuchsia tint for main bg
+          brown: "#7c3aed",   // Deep vibrant violet for borders and secondary text
+          charcoal: "#1e1b4b", // Deep indigo for main text
+          gold: "#0ea5e9",    // Vibrant Sky blue for highlights
         }
       },
       fontFamily: {

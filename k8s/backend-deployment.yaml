@@ -15,17 +15,32 @@ spec:
     spec:
       containers:
         - name: backend
-          image: taskflow-backend:latest
+          image: 784167813131.dkr.ecr.us-west-2.amazonaws.com/taskflow-backend:latest
           ports:
             - containerPort: 8080
-          envFrom:
-            - configMapRef:
-                name: taskflow-config
-            - secretRef:
-                name: taskflow-secret
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://taskflow-prod-db.cd0wkykse8k5.us-west-2.rds.amazonaws.com:5432/taskflow"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: taskflow-secret
+                  key: DB_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskflow-secret
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: taskflow-secret
+                  key: JWT_SECRET
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: "update"
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8080
-            initialDelaySeconds: 20
+            initialDelaySeconds: 30
             periodSeconds: 10

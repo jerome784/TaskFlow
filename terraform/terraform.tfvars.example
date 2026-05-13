@@ -1,0 +1,7 @@
+aws_region   = "us-east-1"
+environment  = "prod"
+vpc_cidr     = "10.0.0.0/16"
+
+# RDS Credentials
+db_username  = "taskflow_admin"
+db_password  = "ChangeThisStrongPassword123!"
