@@ -64,14 +64,16 @@ pipeline {
                         
                         // Step 1: Create namespace first
                         sh 'kubectl apply -f k8s/namespace.yaml'
+                        sh 'sleep 10'
                         
-                        // Wait for namespace to be ready
-                        sh 'sleep 15'
+                        // Step 2: Wait for AWS Load Balancer Controller to be ready
+                        sh 'kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=aws-load-balancer-controller -n kube-system --timeout=300s || true'
+                        sh 'sleep 30'
                         
-                        // Step 2: Apply all other Kubernetes resources
+                        // Step 3: Apply all other Kubernetes resources
                         sh 'kubectl apply -f k8s/'
                         
-                        // Step 3: Update image versions (safe even if deployment doesn't exist yet)
+                        // Step 4: Update image versions
                         sh "kubectl set image deployment/backend-deployment backend=${BACKEND_IMAGE}:${env.BUILD_ID} -n taskflow || true"
                         sh "kubectl set image deployment/frontend-deployment frontend=${FRONTEND_IMAGE}:${env.BUILD_ID} -n taskflow || true"
                     }
